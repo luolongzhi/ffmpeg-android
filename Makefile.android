@@ -1,0 +1,87 @@
+#ffmpeg src
+FFMPEG_VERSION = 3.2.12
+SRC_FFMPEG = ffmpeg-$(FFMPEG_VERSION).tar.bz2
+
+BUILDPATH=build_android
+WORK_PATH := $(shell pwd)
+
+all: ffmpeg 
+clean: 
+	rm -rf $(BUILDPATH)
+
+#ready action
+SOURCE_REDAY = cp_source_code tar_source_code 
+cp_source_code:
+	mkdir $(BUILDPATH) && \
+	cp src/$(SRC_FFMPEG) $(BUILDPATH)
+
+tar_source_code:
+	cd $(BUILDPATH) && \
+	tar xvf $(SRC_FFMPEG) && rm $(SRC_FFMPEG)
+
+#ndk settings
+API=22
+NDK_ENV=darwin
+NDK_ROOTPATH=/Users/luolongzhi/Software/android-ndk-for-mac
+#NDK_ENV=linux
+#NDK_ROOTPATH=/data/Software/android-ndk-for-ubuntu
+
+
+#arm arm64 mips mips64 x86 x86_64
+NDK = $(NDK_ROOTPATH)/android-ndk-r15c
+SYSROOT = $(NDK)/platforms/android-$(API)/arch-$(ARCH)/
+#SYSROOT = $(NDK)/sysroot
+ADDI_CFLAGS=-marm
+#ADDI_CFLAGS=-marm -isystem $(NDK)/sysroot/usr/include/$(TRIPLE) -D__ANDROID_API__=$(API)
+#ADDI_CFLAGS=-marm -isystem $(NDK)/sysroot/usr/include/$(TRIPLE)
+ADDI_LDFLAGS=
+
+FFMPEG_COMMON_ARGS = \
+	--target-os=android \
+	--enable-cross-compile \
+	--enable-shared \
+	--disable-static \
+	--disable-doc \
+	--enable-ffmpeg \
+	--disable-ffplay \
+	--disable-ffprobe \
+	--enable-avdevice \
+	--disable-protocol=udp \
+	--disable-doc \
+	--disable-symver 
+
+#arm/armeabi-v7a/armv7-a  aarch64/arm64-v8a/armv8-a x86/x86/i686
+#arm/aarch64/x86
+ARCH=arm
+
+#armeabi-v7a/arm64-v8a/x86
+ARCH_NAME=armeabi-v7a
+
+#armv7-a/armv8-a/i686
+CPU=armv7-a
+
+#arm-linux-androideabi/aarch64-linux-android-4.9/x86-4.9
+TRIPLE=arm-linux-androideabi
+
+TOOLCHAIN = $(NDK)/toolchains/$(TRIPLE)-4.9/prebuilt/$(NDK_ENV)-x86_64
+
+#arm-linux-androideabi/aarch64-linux-android/i686-linux-android
+GCC_PREFIX = arm-linux-androideabi
+
+CROSS_PREFIX = $(TOOLCHAIN)/bin/$(GCC_PREFIX)-
+
+ffmpeg: $(SOURCE_REDAY)
+	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && \
+	./configure \
+		$(FFMPEG_COMMON_ARGS) \
+		--prefix=$(BUILDPATH)/dist/ffmpeg-$(FFMPEG_VERSION)/$(ARCH_NAME) \
+		--cross-prefix=$(CROSS_PREFIX) \
+		--arch=$(ARCH) \
+		--cpu=$(CPU) \
+		--sysroot=$(SYSROOT) \
+		--extra-cflags="-Os -fpic $(ADDI_CFLAGS)" \
+		--extra-ldflags="$(ADDI_LDFLAGS)" \
+		&& \
+	make -j4 && \
+	make install
+
