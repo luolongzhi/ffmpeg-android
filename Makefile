@@ -10,7 +10,7 @@ clean:
 	rm -rf $(BUILDPATH)
 
 #ready action
-SOURCE_REDAY = cp_source_code tar_source_code 
+SOURCE_REDAY = #cp_source_code tar_source_code 
 cp_source_code:
 	mkdir $(BUILDPATH) && \
 	cp src/$(SRC_FFMPEG) $(BUILDPATH)
@@ -29,6 +29,7 @@ FFMPEG_COMMON_ARGS = \
 	--disable-ffprobe \
 	--enable-avdevice \
 	--disable-doc \
+	--disable-yasm \
 	--disable-symver 
 
 ffmpeg: $(SOURCE_REDAY)
@@ -38,7 +39,7 @@ ffmpeg: $(SOURCE_REDAY)
 		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/pc \
 		--cross-prefix=$(CROSS_PREFIX) \
 		--arch=x86 \
-		--extra-cflags="-Os -fpic \
+		--extra-cflags="-fpic" \
 		--extra-ldflags="" \
 		&& \
 	make -j4 && \
