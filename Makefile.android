@@ -46,7 +46,6 @@ FFMPEG_COMMON_ARGS = \
 	--disable-ffplay \
 	--disable-ffprobe \
 	--enable-avdevice \
-	--disable-protocol=udp \
 	--disable-doc \
 	--disable-symver 
 
