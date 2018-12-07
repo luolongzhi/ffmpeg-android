@@ -5,12 +5,16 @@ SRC_FFMPEG = ffmpeg-$(FFMPEG_VERSION).tar.bz2
 BUILDPATH=build_pc
 WORK_PATH := $(shell pwd)
 
-all: ffmpeg 
+all: ffmpeg_demo
 clean: 
 	rm -rf $(BUILDPATH)
+	rm -rf dist
+	rm -rf demo
+	rm ./ffmpeg-pc/*.o
+	rm ./ffmpeg-pc/ffmpeg_demo
 
 #ready action
-SOURCE_REDAY = #cp_source_code tar_source_code 
+SOURCE_REDAY = cp_source_code tar_source_code 
 cp_source_code:
 	mkdir $(BUILDPATH) && \
 	cp src/$(SRC_FFMPEG) $(BUILDPATH)
@@ -27,6 +31,7 @@ FFMPEG_COMMON_ARGS = \
 	--disable-ffmpeg \
 	--disable-ffplay \
 	--disable-ffprobe \
+	--disable-ffserver \
 	--enable-avdevice \
 	--disable-doc \
 	--disable-yasm \
@@ -45,3 +50,11 @@ ffmpeg: $(SOURCE_REDAY)
 	make -j4 && \
 	make install
 
+ffmpeg-pc: ffmpeg
+	cd $(WORK_PATH)/ffmpeg-pc && make clean && make
+
+ffmpeg_demo: ffmpeg-pc
+	cd $(WORK_PATH) && \
+	mkdir demo && \
+	cp ./dist/ffmpeg-$(FFMPEG_VERSION)/pc/lib/*.so* ./demo
+	cp ./ffmpeg-pc/ffmpeg_demo ./demo

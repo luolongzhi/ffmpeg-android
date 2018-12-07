@@ -29,8 +29,9 @@
    Studio) will not omit unused inline functions and create undefined
    references to libraries that are not being built. */
 
+#include "ffmpeg_thread.h"
 #include "config.h"
-#include "compat/va_copy.h"
+#include "va_copy.h"
 #include "libavformat/avformat.h"
 #include "libavfilter/avfilter.h"
 #include "libavdevice/avdevice.h"
@@ -131,7 +132,8 @@ void exit_program(int ret)
     if (program_exit)
         program_exit(ret);
 
-    exit(ret);
+    ffmpeg_thread_exit(ret);
+    /*exit(ret);*/
 }
 
 double parse_number_or_die(const char *context, const char *numstr, int type,
