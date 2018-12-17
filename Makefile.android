@@ -6,12 +6,13 @@ BUILDPATH=build_android
 WORK_PATH := $(shell pwd)
 
 #all: ffmpeg 
-all: ffmpeg-fast 
+#all: ffmpeg-fast 
+all: ffmpeg-opt1
 clean: 
 	rm -rf $(BUILDPATH)
 
 #ready action
-SOURCE_REDAY = cp_source_code tar_source_code 
+SOURCE_REDAY = #cp_source_code tar_source_code 
 cp_source_code:
 	mkdir $(BUILDPATH) && \
 	cp src/$(SRC_FFMPEG) $(BUILDPATH)
@@ -37,6 +38,29 @@ ADDI_CFLAGS=-marm
 #ADDI_CFLAGS=-marm -isystem $(NDK)/sysroot/usr/include/$(TRIPLE)
 ADDI_LDFLAGS=-L$(SYSROOT)/usr/lib/ -lm -llog
 
+
+
+#common ffmpeg filter and demuxer and decoder
+COMMON_FILTERS_OPT1 = aresample scale crop overlay
+COMMON_DEMUXERS_OPT1 = matroska ogg avi mov flv mpegps image2 mp3 aac adts ac3 wav concat
+COMMON_DECODERS_OPT1 = \
+	vp8 vp9 theora \
+	mpeg2video mpeg4 h264 hevc \
+	png mjpeg \
+	vorbis opus \
+	mp3 ac3 aac \
+	pcm_s16le pcm_s16be\
+	ass ssa srt webvtt
+
+COMMON_FILTERS_OPT2 = aresample scale crop overlay
+COMMON_DEMUXERS_OPT2 = mov flv hls mpegps mpegts image2 mp3 aac adts ac3 wav concat
+COMMON_DECODERS_OPT2 = \
+	vp8 vp9 \
+	mpeg2video mpeg4 h264 \
+	vorbis opus \
+	mp3 ac3 aac \
+	pcm_s16le pcm_s16be\
+
 FFMPEG_COMMON_ARGS = \
 	--target-os=android \
 	--enable-cross-compile \
@@ -46,9 +70,53 @@ FFMPEG_COMMON_ARGS = \
 	--enable-ffmpeg \
 	--disable-ffplay \
 	--disable-ffprobe \
-	--enable-avdevice \
 	--disable-doc \
 	--disable-symver 
+
+FFMPEG_OPT_COMMON = \
+	--target-os=android \
+	--enable-cross-compile \
+	--enable-shared \
+	--disable-static \
+	--disable-doc \
+	--disable-doc \
+	--disable-symver \
+	\
+	--disable-all \
+	--enable-avcodec \
+	--enable-avdevice \
+	--enable-avformat \
+	--enable-avfilter \
+	--enable-avutil \
+	--enable-swresample \
+	--enable-swscale \
+	--enable-network \
+	--enable-protocol=rtmp\
+	--enable-protocol=http\
+	--enable-protocol=file \
+	--disable-bzlib \
+	--disable-iconv \
+	--disable-libxcb \
+	--disable-lzma \
+	--disable-sdl2 \
+	--disable-securetransport \
+	--disable-xlib \
+	--disable-zlib
+
+
+FFMPEG_OPT1_ARGS = \
+	$(FFMPEG_OPT_COMMON) \
+	$(addprefix --enable-decoder=,$(COMMON_DECODERS_OPT1)) \
+	$(addprefix --enable-demuxer=,$(COMMON_DEMUXERS_OPT1)) \
+	$(addprefix --enable-filter=,$(COMMON_FILTERS_OPT1)) \
+
+FFMPEG_OPT2_ARGS = \
+	$(FFMPEG_OPT_COMMON) \
+	$(addprefix --enable-decoder=,$(COMMON_DECODERS_OPT2)) \
+	$(addprefix --enable-demuxer=,$(COMMON_DEMUXERS_OPT2)) \
+	$(addprefix --enable-filter=,$(COMMON_FILTERS_OPT2)) \
+
+
 
 #arm/armeabi-v7a/armv7-a  aarch64/arm64-v8a/armv8-a x86/x86/i686
 #arm/aarch64/x86
@@ -73,13 +141,28 @@ CROSS_PREFIX = $(TOOLCHAIN)/bin/$(GCC_PREFIX)-
 ffmpeg: $(SOURCE_REDAY)
 	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && \
 	./configure \
-		$(FFMPEG_COMMON_ARGS) \
+		$(FFMPEG_OPT1_ARGS) \
 		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/$(ARCH_NAME) \
 		--cross-prefix=$(CROSS_PREFIX) \
 		--arch=$(ARCH) \
 		--cpu=$(CPU) \
 		--sysroot=$(SYSROOT) \
-		--extra-cflags="-Os -fpic $(ADDI_CFLAGS)" \
+		--extra-cflags="-Os -fPIC $(ADDI_CFLAGS)" \
+		--extra-ldflags="$(ADDI_LDFLAGS)" \
+		&& \
+	make -j4 && \
+	make install
+
+ffmpeg-opt1:
+	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && \
+	./configure \
+		$(FFMPEG_OPT1_ARGS) \
+		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/$(ARCH_NAME) \
+		--cross-prefix=$(CROSS_PREFIX) \
+		--arch=$(ARCH) \
+		--cpu=$(CPU) \
+		--sysroot=$(SYSROOT) \
+		--extra-cflags="-Os -fPIC $(ADDI_CFLAGS)" \
 		--extra-ldflags="$(ADDI_LDFLAGS)" \
 		&& \
 	make -j4 && \
