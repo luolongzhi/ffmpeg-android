@@ -7,7 +7,7 @@ WORK_PATH := $(shell pwd)
 
 #all: ffmpeg 
 #all: ffmpeg-fast 
-all: ffmpeg-opt1
+all: ffmpeg-opt
 clean: 
 	rm -rf $(BUILDPATH)
 
@@ -117,25 +117,37 @@ FFMPEG_OPT2_ARGS = \
 	$(addprefix --enable-filter=,$(COMMON_FILTERS_OPT2)) \
 
 
-
 #arm/armeabi-v7a/armv7-a  aarch64/arm64-v8a/armv8-a x86/x86/i686
+#----------------------------------arch define-----------------------------------
+
 #arm/aarch64/x86
 ARCH=arm
+#ARCH=aarch64
+#ARCH=x86
 
 #armeabi-v7a/arm64-v8a/x86
 ARCH_NAME=armeabi-v7a
+#ARCH_NAME=arm64-v8a
+#ARCH_NAME=x86
 
 #armv7-a/armv8-a/i686
 CPU=armv7-a
+#CPU=armv8-a
+#CPU=i686
 
 #arm-linux-androideabi/aarch64-linux-android-4.9/x86-4.9
 TRIPLE=arm-linux-androideabi
-
-TOOLCHAIN = $(NDK)/toolchains/$(TRIPLE)-4.9/prebuilt/$(NDK_ENV)-x86_64
+#TRIPLE=aarch64-linux-android
+#TRIPLE=x86
 
 #arm-linux-androideabi/aarch64-linux-android/i686-linux-android
-GCC_PREFIX = arm-linux-androideabi
+GCC_PREFIX=arm-linux-androideabi
+#GCC_PREFIX=aarch64-linux-android 
+#GCC_PREFIX=i686-linux-android
 
+#----------------------------------arch define-----------------------------------
+
+TOOLCHAIN = $(NDK)/toolchains/$(TRIPLE)-4.9/prebuilt/$(NDK_ENV)-x86_64
 CROSS_PREFIX = $(TOOLCHAIN)/bin/$(GCC_PREFIX)-
 
 ffmpeg: $(SOURCE_REDAY)
@@ -153,10 +165,10 @@ ffmpeg: $(SOURCE_REDAY)
 	make -j4 && \
 	make install
 
-ffmpeg-opt1:
+ffmpeg-opt:
 	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && \
 	./configure \
-		$(FFMPEG_OPT1_ARGS) \
+		$(FFMPEG_OPT2_ARGS) \
 		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/$(ARCH_NAME) \
 		--cross-prefix=$(CROSS_PREFIX) \
 		--arch=$(ARCH) \
