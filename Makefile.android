@@ -5,7 +5,8 @@ SRC_FFMPEG = ffmpeg-$(FFMPEG_VERSION).tar.bz2
 BUILDPATH=build_android
 WORK_PATH := $(shell pwd)
 
-all: ffmpeg 
+#all: ffmpeg 
+all: ffmpeg-fast 
 clean: 
 	rm -rf $(BUILDPATH)
 
@@ -34,7 +35,7 @@ SYSROOT = $(NDK)/platforms/android-$(API)/arch-$(ARCH)/
 ADDI_CFLAGS=-marm
 #ADDI_CFLAGS=-marm -isystem $(NDK)/sysroot/usr/include/$(TRIPLE) -D__ANDROID_API__=$(API)
 #ADDI_CFLAGS=-marm -isystem $(NDK)/sysroot/usr/include/$(TRIPLE)
-ADDI_LDFLAGS=
+ADDI_LDFLAGS=-L$(SYSROOT)/usr/lib/ -lm -llog
 
 FFMPEG_COMMON_ARGS = \
 	--target-os=android \
@@ -73,7 +74,7 @@ ffmpeg: $(SOURCE_REDAY)
 	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && \
 	./configure \
 		$(FFMPEG_COMMON_ARGS) \
-		--prefix=$(BUILDPATH)/dist/ffmpeg-$(FFMPEG_VERSION)/$(ARCH_NAME) \
+		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/$(ARCH_NAME) \
 		--cross-prefix=$(CROSS_PREFIX) \
 		--arch=$(ARCH) \
 		--cpu=$(CPU) \
@@ -83,4 +84,10 @@ ffmpeg: $(SOURCE_REDAY)
 		&& \
 	make -j4 && \
 	make install
+
+ffmpeg-fast: 
+	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && \
+	make -j4 && \
+	make install
+
 

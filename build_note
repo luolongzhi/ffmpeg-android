@@ -1,0 +1,2 @@
+1. 修改log2f在libavutil/libm.h中的HAVE_LOG2注释
+2. 把atof修改为strtod
