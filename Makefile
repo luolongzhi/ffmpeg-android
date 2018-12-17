@@ -23,19 +23,53 @@ tar_source_code:
 	cd $(BUILDPATH) && \
 	tar xvf $(SRC_FFMPEG) && rm $(SRC_FFMPEG)
 
+
+#common ffmpeg filter and demuxer and decoder
+COMMON_FILTERS = aresample scale crop overlay
+COMMON_DEMUXERS = matroska ogg avi mov flv mpegps image2 mp3 aac adts ac3 wav concat
+COMMON_DECODERS = \
+	vp8 vp9 theora \
+	mpeg2video mpeg4 h264 hevc \
+	png mjpeg \
+	vorbis opus \
+	mp3 ac3 aac \
+	pcm_s16le pcm_s16be\
+	ass ssa srt webvtt
+
+
 FFMPEG_COMMON_ARGS = \
 	--target-os=none \
 	--enable-shared \
 	--disable-static \
 	--disable-doc \
-	--disable-ffmpeg \
-	--disable-ffplay \
-	--disable-ffprobe \
-	--disable-ffserver \
-	--enable-avdevice \
 	--disable-doc \
 	--disable-yasm \
-	--disable-symver 
+	--disable-symver \
+	\
+	--disable-all \
+	--enable-avcodec \
+	--enable-avdevice \
+	--enable-avformat \
+	--enable-avfilter \
+	--enable-avutil \
+	--enable-swresample \
+	--enable-swscale \
+	--enable-network \
+	--enable-protocol=rtmp\
+	--enable-protocol=http\
+	--enable-protocol=file \
+	$(addprefix --enable-decoder=,$(COMMON_DECODERS)) \
+	$(addprefix --enable-demuxer=,$(COMMON_DEMUXERS)) \
+	$(addprefix --enable-filter=,$(COMMON_FILTERS)) \
+	--disable-bzlib \
+	--disable-iconv \
+	--disable-libxcb \
+	--disable-lzma \
+	--disable-sdl2 \
+	--disable-securetransport \
+	--disable-xlib \
+	--disable-zlib
+
 
 ffmpeg: $(SOURCE_REDAY)
 	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && \
@@ -44,7 +78,7 @@ ffmpeg: $(SOURCE_REDAY)
 		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/pc \
 		--cross-prefix=$(CROSS_PREFIX) \
 		--arch=x86 \
-		--extra-cflags="-fpic" \
+		--extra-cflags="-fPIC" \
 		--extra-ldflags="" \
 		&& \
 	make -j4 && \
