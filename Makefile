@@ -35,6 +35,8 @@ COMMON_DECODERS = \
 	mp3 ac3 aac \
 	pcm_s16le pcm_s16be\
 	ass ssa srt webvtt
+COMMON_ENCODERS = pcm_s16be pcm_s16le
+COMMON_MUXERS = mp4 mp3 adts wav image2 webm ogg
 
 
 FFMPEG_COMMON_ARGS = \
@@ -60,6 +62,8 @@ FFMPEG_COMMON_ARGS = \
 	--enable-protocol=file \
 	$(addprefix --enable-decoder=,$(COMMON_DECODERS)) \
 	$(addprefix --enable-demuxer=,$(COMMON_DEMUXERS)) \
+	$(addprefix --enable-encoder=,$(COMMON_ENCODERS)) \
+	$(addprefix --enable-muxer=,$(COMMON_MUXERS)) \
 	$(addprefix --enable-filter=,$(COMMON_FILTERS)) \
 	--disable-bzlib \
 	--disable-iconv \

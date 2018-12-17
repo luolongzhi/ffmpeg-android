@@ -51,15 +51,19 @@ COMMON_DECODERS_OPT1 = \
 	mp3 ac3 aac \
 	pcm_s16le pcm_s16be\
 	ass ssa srt webvtt
+COMMON_ENCODERS_OPT1 = pcm_s16be pcm_s16le
+COMMON_MUXERS_OPT1 = mp4 mp3 adts wav image2 webm ogg
 
-COMMON_FILTERS_OPT2 = aresample scale crop overlay
-COMMON_DEMUXERS_OPT2 = mov flv hls mpegps mpegts image2 mp3 aac adts ac3 wav concat
+COMMON_FILTERS_OPT2 = aresample scale crop
+COMMON_DEMUXERS_OPT2 = avi mov flv hls image2 mpegps mp3 aac adts ac3 wav concat
 COMMON_DECODERS_OPT2 = \
 	vp8 vp9 \
 	mpeg2video mpeg4 h264 \
 	vorbis opus \
 	mp3 ac3 aac \
 	pcm_s16le pcm_s16be\
+COMMON_ENCODERS_OPT2 = pcm_s16be pcm_s16le
+COMMON_MUXERS_OPT2 = mp4 mp3 adts wav image2 
 
 FFMPEG_COMMON_ARGS = \
 	--target-os=android \
@@ -108,12 +112,16 @@ FFMPEG_OPT1_ARGS = \
 	$(FFMPEG_OPT_COMMON) \
 	$(addprefix --enable-decoder=,$(COMMON_DECODERS_OPT1)) \
 	$(addprefix --enable-demuxer=,$(COMMON_DEMUXERS_OPT1)) \
+	$(addprefix --enable-encoder=,$(COMMON_ENCODERS_OPT1)) \
+	$(addprefix --enable-muxer=,$(COMMON_MUXERS_OPT1)) \
 	$(addprefix --enable-filter=,$(COMMON_FILTERS_OPT1)) \
 
 FFMPEG_OPT2_ARGS = \
 	$(FFMPEG_OPT_COMMON) \
 	$(addprefix --enable-decoder=,$(COMMON_DECODERS_OPT2)) \
 	$(addprefix --enable-demuxer=,$(COMMON_DEMUXERS_OPT2)) \
+	$(addprefix --enable-encoder=,$(COMMON_ENCODERS_OPT2)) \
+	$(addprefix --enable-muxer=,$(COMMON_MUXERS_OPT2)) \
 	$(addprefix --enable-filter=,$(COMMON_FILTERS_OPT2)) \
 
 
