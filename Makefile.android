@@ -126,7 +126,7 @@ CROSS_PREFIX_ARMV7 = $(TOOLCHAIN_ARMV7)/bin/arm-linux-androideabi-
 CROSS_PREFIX_ARM64 = $(TOOLCHAIN_ARM64)/bin/aarch64-linux-android-
 
 ffmpeg-armv7: $(SOURCE_REDAY)
-	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && make clean && rm -f compat/strtod.d && rm -f compat/strtod.o
+	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && make clean && rm -f compat/strtod.d && rm -f compat/strtod.o && \
 	./configure \
 		$(FFMPEG_COMMON_ARGS) \
 		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/armeabi-v7a \
@@ -141,7 +141,7 @@ ffmpeg-armv7: $(SOURCE_REDAY)
 	make install
 
 ffmpeg-arm64: $(SOURCE_REDAY)
-	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && make clean && rm -f compat/strtod.d && rm -f compat/strtod.o 
+	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && make clean && rm -f compat/strtod.d && rm -f compat/strtod.o && \
 	./configure \
 		$(FFMPEG_COMMON_ARGS) \
 		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/arm64-v8a \
