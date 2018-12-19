@@ -13,7 +13,7 @@ clean:
 	rm -rf $(BUILDPATH)
 
 #ready action
-SOURCE_REDAY = cp_source_code tar_source_code 
+SOURCE_REDAY = #cp_source_code tar_source_code 
 cp_source_code:
 	mkdir $(BUILDPATH) && \
 	cp src/$(SRC_FFMPEG) $(BUILDPATH)
@@ -53,9 +53,10 @@ FFMPEG_COMMON_ARGS = \
 	--enable-shared \
 	--disable-static \
 	--disable-doc \
-	--enable-ffmpeg \
+	--disable-ffmpeg \
 	--disable-ffplay \
 	--disable-ffprobe \
+	--disable-ffserver \
 	--disable-doc \
 	--disable-symver 
 
@@ -150,16 +151,17 @@ ffmpeg-arm64: $(SOURCE_REDAY)
 		$(FFMPEG_COMMON_ARGS) \
 		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/arm64-v8a \
 		--cross-prefix=$(CROSS_PREFIX_ARM64) \
+		--extra-libs="-lgcc" \
 		--arch=aarch64 \
 		--cpu=armv8-a \
 		--sysroot=$(SYSROOT_ARM64) \
 		--disable-inline-asm \
 		--disable-asm \
 		--disable-yasm \
-		--extra-cflags="-O3 -fPIC -march=armv8-a -DANDROID -Dipv6mr_interface=ipv6mr_ifindex -Wno-psabi -fno-short-enums -fno-strict-aliasing -finline-limit=300 -ffast-math" \
-		--extra-ldflags="-Wl,-rpath-link=$(SYSROOT_ARM64)/usr/lib -L$(SYSROOT_ARM64)/usr/lib/ -nostdlib -lm -lc -ldl" \
+		--extra-cflags="-O3 -fPIC -march=armv8-a -DANDROID -Wno-psabi -fno-short-enums -fstrict-aliasing -ffast-math" \
+		--extra-ldflags="-L$(SYSROOT_ARM64)usr/lib/ -nostdlib -lm -lc -ldl" \
 		&& \
-	make && \
+	make -j4 && \
 	make install
 
 ffmpeg-fast: 
