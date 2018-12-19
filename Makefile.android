@@ -5,7 +5,8 @@ SRC_FFMPEG = ffmpeg-$(FFMPEG_VERSION)-ok.tar.bz2
 BUILDPATH=build_android
 WORK_PATH := $(shell pwd)
 
-all: ffmpeg-armv7 ffmpeg-arm64 
+#all: ffmpeg-armv7 ffmpeg-arm64 
+all: ffmpeg-arm64 
 #all: ffmpeg-fast 
 #all: ffmpeg-opt
 clean: 
@@ -137,7 +138,7 @@ ffmpeg-armv7: $(SOURCE_REDAY)
 		--disable-inline-asm \
 		--disable-asm \
 		--disable-yasm \
-		--extra-cflags="-Os -fPIC -marm" \
+		--extra-cflags="-Os -fPIC -march=armv7-a" \
 		--extra-ldflags="-L$(SYSROOT_ARMV7)/usr/lib/ -lm" \
 		&& \
 	make -j4 && \
@@ -155,8 +156,8 @@ ffmpeg-arm64: $(SOURCE_REDAY)
 		--disable-inline-asm \
 		--disable-asm \
 		--disable-yasm \
-		--extra-cflags="-Os -fPIC -march=armv8-a" \
-		--extra-ldflags="-L$(SYSROOT_ARM64)/usr/lib/ -lm" \
+		--extra-cflags="-O3 -fPIC -march=armv8-a -DANDROID -Dipv6mr_interface=ipv6mr_ifindex -Wno-psabi -fno-short-enums -fno-strict-aliasing -finline-limit=300 -ffast-math" \
+		--extra-ldflags="-Wl,-rpath-link=$(SYSROOT_ARM64)/usr/lib -L$(SYSROOT_ARM64)/usr/lib/ -nostdlib -lm -lc -ldl" \
 		&& \
 	make && \
 	make install
