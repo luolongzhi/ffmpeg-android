@@ -33,7 +33,7 @@ COMMON_DECODERS_OPT1 = \
 	mp3 ac3 aac \
 	pcm_s16le pcm_s16be\
 	ass ssa srt webvtt
-COMMON_ENCODERS_OPT1 = pcm_s16be pcm_s16le
+COMMON_ENCODERS_OPT1 = aac pcm_s16be pcm_s16le
 COMMON_MUXERS_OPT1 = mp4 mp3 adts wav image2 webm ogg
 
 COMMON_FILTERS_OPT2 = aresample scale crop
@@ -66,21 +66,15 @@ FFMPEG_OPT_COMMON = \
 	--enable-shared \
 	--disable-static \
 	--disable-doc \
-	--disable-doc \
 	--disable-symver \
+	--disable-ffmpeg \
+	--disable-ffplay \
+	--disable-ffprobe \
+	--disable-ffserver \
 	\
-	--disable-all \
-	--enable-avcodec \
-	--enable-avdevice \
-	--enable-avformat \
-	--enable-avfilter \
-	--enable-avutil \
-	--enable-swresample \
-	--enable-swscale \
-	--enable-network \
-	--enable-protocol=rtmp\
-	--enable-protocol=http\
-	--enable-protocol=file \
+	--disable-encoders \
+	--disable-decoders \
+	--disable-muxers\
 	--disable-bzlib \
 	--disable-iconv \
 	--disable-libxcb \
@@ -93,11 +87,9 @@ FFMPEG_OPT_COMMON = \
 
 FFMPEG_OPT1_ARGS = \
 	$(FFMPEG_OPT_COMMON) \
-	$(addprefix --enable-decoder=,$(COMMON_DECODERS_OPT1)) \
-	$(addprefix --enable-demuxer=,$(COMMON_DEMUXERS_OPT1)) \
 	$(addprefix --enable-encoder=,$(COMMON_ENCODERS_OPT1)) \
+	$(addprefix --enable-decoder=,$(COMMON_DECODERS_OPT1)) \
 	$(addprefix --enable-muxer=,$(COMMON_MUXERS_OPT1)) \
-	$(addprefix --enable-filter=,$(COMMON_FILTERS_OPT1)) \
 
 FFMPEG_OPT2_ARGS = \
 	$(FFMPEG_OPT_COMMON) \
@@ -148,7 +140,7 @@ ffmpeg-armv7: $(SOURCE_REDAY)
 ffmpeg-arm64: $(SOURCE_REDAY)
 	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && make clean && rm -f compat/strtod.d && rm -f compat/strtod.o && \
 	./configure \
-		$(FFMPEG_COMMON_ARGS) \
+		$(FFMPEG_OPT1_ARGS) \
 		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/arm64-v8a \
 		--cross-prefix=$(CROSS_PREFIX_ARM64) \
 		--extra-libs="-lgcc" \
