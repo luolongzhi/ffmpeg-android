@@ -1,6 +1,6 @@
 #ffmpeg src
 FFMPEG_VERSION = 3.2.12
-SRC_FFMPEG = ffmpeg-$(FFMPEG_VERSION).tar.bz2
+SRC_FFMPEG = ffmpeg-$(FFMPEG_VERSION)-ok.tar.bz2
 
 BUILDPATH=build_android
 WORK_PATH := $(shell pwd)
@@ -134,6 +134,9 @@ ffmpeg-armv7: $(SOURCE_REDAY)
 		--arch=arm \
 		--cpu=armv7-a \
 		--sysroot=$(SYSROOT_ARMV7) \
+		--disable-inline-asm \
+		--disable-asm \
+		--disable-yasm \
 		--extra-cflags="-Os -fPIC -marm" \
 		--extra-ldflags="-L$(SYSROOT_ARMV7)/usr/lib/ -lm" \
 		&& \
@@ -149,10 +152,13 @@ ffmpeg-arm64: $(SOURCE_REDAY)
 		--arch=aarch64 \
 		--cpu=armv8-a \
 		--sysroot=$(SYSROOT_ARM64) \
+		--disable-inline-asm \
+		--disable-asm \
+		--disable-yasm \
 		--extra-cflags="-Os -fPIC -march=armv8-a" \
 		--extra-ldflags="-L$(SYSROOT_ARM64)/usr/lib/ -lm" \
 		&& \
-	make -j4 && \
+	make && \
 	make install
 
 ffmpeg-fast: 

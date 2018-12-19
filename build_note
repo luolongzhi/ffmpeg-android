@@ -1,2 +1,3 @@
 1. 修改log2f在libavutil/libm.h中的HAVE_LOG2注释
 2. 把atof修改为strtod
+3. 把libavcodec中mathops.h中的关于arm的注释掉，configure时开启--disable-asm --disable-yasm
