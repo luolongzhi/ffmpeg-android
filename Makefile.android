@@ -5,8 +5,8 @@ SRC_FFMPEG = ffmpeg-$(FFMPEG_VERSION)-ok.tar.bz2
 BUILDPATH=build_android
 WORK_PATH := $(shell pwd)
 
-#all: ffmpeg-armv7 ffmpeg-arm64 
-all: ffmpeg-arm64 
+all: ffmpeg-armv7 ffmpeg-arm64 
+#all: ffmpeg-arm64 
 #all: ffmpeg-fast 
 #all: ffmpeg-opt
 clean: 
@@ -24,7 +24,7 @@ tar_source_code:
 
 #common ffmpeg filter and demuxer and decoder
 COMMON_FILTERS_OPT1 = aresample scale crop overlay
-COMMON_DEMUXERS_OPT1 = matroska ogg avi mov flv mpegps image2 mp3 aac adts ac3 wav concat
+COMMON_DEMUXERS_OPT1 = matroska ogg g729 avi mov flv mpegps mpegts image2 mp3 aac ac3 wav pcm_s16be pcm_s16le concat
 COMMON_DECODERS_OPT1 = \
 	vp8 vp9 theora \
 	mpeg2video mpeg4 h264 hevc \
@@ -34,7 +34,7 @@ COMMON_DECODERS_OPT1 = \
 	pcm_s16le pcm_s16be\
 	ass ssa srt webvtt
 COMMON_ENCODERS_OPT1 = aac pcm_s16be pcm_s16le
-COMMON_MUXERS_OPT1 = mp4 mp3 adts wav image2 webm ogg
+COMMON_MUXERS_OPT1 = mp4 mp3 adts wav pcm_s16be pcm_s16le image2 webm ogg
 
 COMMON_FILTERS_OPT2 = aresample scale crop
 COMMON_DEMUXERS_OPT2 = avi mov flv hls image2 mpegps mp3 aac adts ac3 wav concat
@@ -122,17 +122,18 @@ CROSS_PREFIX_ARM64 = $(TOOLCHAIN_ARM64)/bin/aarch64-linux-android-
 ffmpeg-armv7: $(SOURCE_REDAY)
 	cd $(BUILDPATH)/ffmpeg-$(FFMPEG_VERSION) && make clean && rm -f compat/strtod.d && rm -f compat/strtod.o && \
 	./configure \
-		$(FFMPEG_COMMON_ARGS) \
+		$(FFMPEG_OPT1_ARGS) \
 		--prefix=$(WORK_PATH)/dist/ffmpeg-$(FFMPEG_VERSION)/armeabi-v7a \
 		--cross-prefix=$(CROSS_PREFIX_ARMV7) \
+		--extra-libs="-lgcc" \
 		--arch=arm \
 		--cpu=armv7-a \
 		--sysroot=$(SYSROOT_ARMV7) \
 		--disable-inline-asm \
 		--disable-asm \
 		--disable-yasm \
-		--extra-cflags="-Os -fPIC -march=armv7-a" \
-		--extra-ldflags="-L$(SYSROOT_ARMV7)/usr/lib/ -lm" \
+		--extra-cflags="-O2 -fPIC -march=armv7-a -DANDROID -Wno-psabi -fno-short-enums -fstrict-aliasing -ffast-math" \
+		--extra-ldflags="-L$(SYSROOT_ARMV7)/usr/lib/ -nostdlib -lm -lc -ldl" \
 		&& \
 	make -j4 && \
 	make install
@@ -150,7 +151,7 @@ ffmpeg-arm64: $(SOURCE_REDAY)
 		--disable-inline-asm \
 		--disable-asm \
 		--disable-yasm \
-		--extra-cflags="-O3 -fPIC -march=armv8-a -DANDROID -Wno-psabi -fno-short-enums -fstrict-aliasing -ffast-math" \
+		--extra-cflags="-O2 -fPIC -march=armv8-a -DANDROID -Wno-psabi -fno-short-enums -fstrict-aliasing -ffast-math" \
 		--extra-ldflags="-L$(SYSROOT_ARM64)usr/lib/ -nostdlib -lm -lc -ldl" \
 		&& \
 	make -j4 && \
